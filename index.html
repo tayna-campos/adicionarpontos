@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Controle de Pontos</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#f4f6f8;
+  padding:20px;
+}
+
+h2{
+  text-align:center;
+}
+
+.aluno{
+  background:white;
+  padding:15px;
+  margin-bottom:10px;
+  border-radius:10px;
+  box-shadow:0 3px 8px rgba(0,0,0,0.05);
+}
+
+.nome{
+  font-size:18px;
+  margin-bottom:10px;
+}
+
+button{
+  padding:10px 14px;
+  margin-right:8px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+}
+
+.add{ background:#28a745; color:white; }
+.rem{ background:#dc3545; color:white; }
+
+</style>
+</head>
+
+<body>
+
+<h2>Controle de Pontos</h2>
+
+<div id="lista"></div>
+
+<script>
+
+function alterar(nome, valor){
+fetch("https://script.google.com/macros/s/AKfycbydFJ6khKMBFc9OIIqonQm8sDZjoGDVnCF7LFFtX5rlsVpLRdiPtI3oRX13dpHADB6Vbg/exec",{
+  method:"POST",
+  headers:{
+    "Content-Type":"application/x-www-form-urlencoded"
+  },
+  body:"nome="+encodeURIComponent(nome)+"&valor="+valor
+})
+.then(r=>r.text())
+.then(()=>alert("Pontuação atualizada"));
+}
+
+function carregarAlunos(){
+
+fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vRk96_12nVtRCqLVy1nrya4V9ioZWsI0kxDSNTvRpQvHDAPRJz8RX5IY-csGjx7h_LqgRgz52HaYHLi/pub?gid=1881468036&single=true&output=csv")
+.then(r=>r.text())
+.then(text=>{
+
+  let linhas = text.trim().split("\n");
+  linhas.shift();
+
+  let div = document.getElementById("lista");
+  div.innerHTML = "";
+
+  linhas.forEach(linha=>{
+    let col = linha.split(",");
+    let nome = col[0];
+
+    if(!nome) return;
+
+    let bloco = document.createElement("div");
+    bloco.className="aluno";
+    bloco.innerHTML = `
+      <div class="nome">${nome}</div>
+      <button class="add" onclick="alterar('${nome}',10)">+10</button>
+      <button class="rem" onclick="alterar('${nome}',-5)">-5</button>
+    `;
+
+    div.appendChild(bloco);
+  });
+
+});
+
+}
+
+carregarAlunos();
+
+</script>
+
+</body>
+</html>
